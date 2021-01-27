@@ -77,23 +77,11 @@ def GetXYs(eid, video_type, trial_range):
     print('Last trial ends at time %s, which is stamp index %s' %
           (last_time_stamp, last_stamp_idx))
 
+    
     Times = cam['times'][frame_start:frame_stop]
     n_stamps = len(cam['times'])  #
-    del cam['times']
 
-    # some exceptions for inconsisitent data formats
-    try:
-        dlc_name = '_ibl_%sCamera.dlc.pqt' % video_type
-        dlc_path = alf_path / dlc_name
-        cam = pd.read_parquet(dlc_path, engine="fastparquet")
-    except BaseException:
-        raw_vid_path = alf_path.parent / 'raw_video_data'
-        cam = alf.io.load_object(
-            raw_vid_path,
-            '%sCamera' %
-            video_type,
-            namespace='ibl')
-
+    cam = cam['dlc']
     points = np.unique(['_'.join(x.split('_')[:-1]) for x in cam.keys()])
 
     if video_type != 'body':
